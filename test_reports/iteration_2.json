@@ -1,0 +1,89 @@
+{
+  "summary": "Backend regression/concurrency tests were expanded, but current environment-wide auth throttling caused most reruns to skip. Frontend phone E2E was reattempted multiple times and remains blocked by admin layout modal usability plus recurring AdminManager red-screen in expo logs.",
+  "backend_issues": {
+    "critical": [
+      {
+        "endpoint": "POST /api/auth/login (admin identifier by email)",
+        "issue": "Frequent 429 rate-limit blocks repeat UI/API validation loops; admin email path throttles quickly in shared preview load.",
+        "priority": "HIGH"
+      }
+    ],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Admin layout builder element sheet",
+        "issue": "On phone viewport (390x844), seat configuration controls near sheet bottom (e.g., ladies switch/status select/save path) are not reliably tappable in automation due viewport/overlay constraints; E2E flow repeatedly breaks here.",
+        "testID": "element-ladies-switch",
+        "priority": "HIGH"
+      },
+      {
+        "component": "Admin layout builder element sheet",
+        "issue": "Blocked-status configuration interaction fails in mobile sheet context (outside viewport/tap interception), preventing completion of full required layout composition flow.",
+        "testID": "element-status-input",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Admin sign-in -> bus/layout full composition -> route/driver/trip -> passenger/driver end-to-end",
+        "issue": "Could not complete requested full phone E2E due repeated mobile sheet interaction failures and recurring admin render error evidence in logs.",
+        "affected_testIDs": [
+          "save-buses-button",
+          "element-ladies-switch",
+          "element-status-input"
+        ]
+      }
+    ],
+    "design_issues": [
+      {
+        "screen": "Admin mobile sheets",
+        "issues": [
+          "Critical controls near sheet bottom are not robustly actionable on phone automation path.",
+          "This directly conflicts with requirement that sheets remain usable above navigation." 
+        ]
+      }
+    ],
+    "react_native_issues": [
+      {
+        "component": "src/components/admin-manager.tsx",
+        "issue": "Expo logs still report 'Unexpected text node: . A text node cannot be a child of a <View>' in AdminManager render path."
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_foundation_api.py",
+    "/app/backend/tests/test_concurrency_regression.py",
+    "/app/test_reports/pytest/pytest_results_iter2.xml",
+    "/app/test_reports/pytest/pytest_results_iter2_final.xml",
+    "/app/test_reports/phase1_mobile_load.jpeg",
+    "/app/test_reports/iter2_ui_failure.jpeg",
+    "/app/test_reports/iter2_layout_saved.jpeg"
+  ],
+  "action_items": [
+    "Fix AdminManager render tree to permanently eliminate Unexpected text node red-screen recurrence.",
+    "Fix mobile sheet usability in layout builder so bottom controls are consistently tappable on 390x844.",
+    "Stabilize/coordinate auth throttling for QA loops (or isolate QA account buckets) so full E2E can execute without repeated 429 interruptions.",
+    "After above fixes, rerun full requested flow including support reply roundtrip, driver assigned-trip authorization checks, and tablet overflow validation."
+  ],
+  "critical_code_review_comments": [
+    "AdminManager remains a dense single-line JSX return block, which is brittle and hard to reason about for RN text-node constraints.",
+    "Invalid icon name warning ('arrow-up-right' for Ionicons) appears repeatedly in web logs and should be corrected.",
+    "Auth test reliability currently depends on environmental rate-limit window rather than deterministic QA setup."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_concurrency_regression.py",
+    "/app/backend/tests/test_foundation_api.py",
+    "/app/test_reports/iteration_2.json"
+  ],
+  "success_rate": {
+    "backend": "40% (historical pass evidence exists, but latest reruns were skipped by rate-limit)",
+    "frontend": "30%"
+  },
+  "seed_data_creation": "Multiple QA buses were created during interrupted admin UI attempts (QA-* pattern). No new persistent QA passenger/driver credentials were confirmed as fully created via completed flow.",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Use admin mobile identifier (+919000000001) instead of email during current throttle window. Start by reproducing admin layout mobile-sheet tap issues and validating admin-manager red-screen fix before deep E2E.",
+  "rca_of_issue": "RCA: (1) Admin UI still emits Unexpected text node error from admin-manager.tsx in supervisor expo logs, indicating unresolved render-path defect. (2) Layout configuration sheet on phone places key controls in a region that Playwright repeatedly treats as outside actionable viewport; this blocked required ladies/blocked status interactions and downstream full-flow completion. (3) Auth rate-limit windows in shared environment made repeated admin/email and register regression loops non-deterministic, forcing pytest skips and interrupting end-to-end continuity."
+}

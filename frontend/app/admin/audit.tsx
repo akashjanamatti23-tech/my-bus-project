@@ -1,0 +1,7 @@
+import { ScrollView, Text, View, RefreshControl } from 'react-native';
+import { useResource } from '@/src/use-resource';
+import { Header, Card, Badge, Notice, Loading, Empty, Button, s } from '@/src/components/ui';
+export default function Audit() {
+  const { data, error, loading, refresh } = useResource<any[]>('/admin/audit', true);
+  return <><Header title="Activity & audit" subtitle="A traceable history of your operations." /><ScrollView contentContainerStyle={s.content} refreshControl={<RefreshControl refreshing={false} onRefresh={refresh} />}><Notice message={error} />{loading ? <Loading /> : data?.length ? data.map(item => <Card key={item.id} testID={`audit-entry-${item.id}`}><View style={s.between}><Badge title={item.role} /><Text style={s.caption}>{new Date(item.created_at).toLocaleDateString('en-IN')}</Text></View><Text style={s.bodyStrong}>{item.action.replaceAll('_', ' ')}</Text><Text style={s.body}>{item.actor_name}{item.detail ? `\n${item.detail}` : ''}</Text><Text style={s.caption}>{new Date(item.created_at).toLocaleTimeString('en-IN')} · {item.entity_id.slice(0, 8)}</Text></Card>) : <Empty icon="shield-checkmark-outline" title="A clear history starts here" description="Administrative changes and sign-ins are recorded automatically." />}{error && <Button title="Try again" testID="retry-audit-button" onPress={refresh} />}</ScrollView></>;
+}

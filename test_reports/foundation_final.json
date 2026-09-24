@@ -1,0 +1,20 @@
+{
+  "release_scope": "GoBus foundation only; not full production platform",
+  "date": "2026-09-24",
+  "backend": {"result": "passed", "suites": 5, "skipped": 0, "evidence": "/app/test_reports/pytest/verified_foundation.xml", "includes": ["auth and RBAC", "admin layout and schedule validation", "true simultaneous atomic multi-seat holds", "hold release and expiration", "reservation fare validation", "phone normalization", "offers/support", "driver assignment scope and future-date guard"]},
+  "frontend": {
+    "admin_phone": "Passed creation of bus, lower ladies/blocked seats, upper berth, driver cabin, route, driver account and published trip using UI",
+    "passenger_phone": "Passed registration/login, route/date search, filters/sort, exact configured layout, seat hold, passenger/stop details and correct reservation DRAFT fare",
+    "release": "Owner release request sent from UI; database confirmed empty holds; API release assertions pass",
+    "driver_phone": "Passed separate login, assigned trip, stops, manifest, future-date status rejection",
+    "tablet": "Admin sidebar navigation verified at1024x768; phone/tablet page width checks390/1024 match viewport",
+    "evidence_logs": ["/root/.emergent/automation_output/20260924_174636/console_20260924_174636.log", "/root/.emergent/automation_output/20260924_174804/console_20260924_174804.log", "/root/.emergent/automation_output/20260924_174834/console_20260924_174834.log"],
+    "known_automation_limitations": "Two unscoped text selectors matched inactive stack content; corrected with testIDs. Tablet screenshot captured a loading frame, while sidebar and width checks passed. Native hardware flows not tested."
+  },
+  "resolved_findings": ["RN empty-string text-node render issue; fresh logs clean", "Modal bottom controls inaccessible; explicit86% height with flex inner ScrollView verified", "Formatted mobile validation before regex", "Unsupported icon fallback"],
+  "test_throttling": "Local QA counters reset once before final suites. Application rate limits remain enforced. No test auth bypass added.",
+  "operational_data": "Only identified QA fixtures/accounts removed. Real user accounts and bootstrap Admin preserved.",
+  "not_implemented_or_unavailable": ["Razorpay checkout and verified payments (credentials not supplied)", "OTP/password-reset delivery", "Confirmed bookings and e-tickets", "Source/Destination QR verification", "Live GPS/map tracking", "Wallet/cashback/refunds", "Advanced reports/analytics", "Full specification modules retained in PRD backlog"],
+  "mocked_apis": false,
+  "production_ready": false
+}

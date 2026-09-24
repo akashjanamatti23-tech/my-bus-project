@@ -1,0 +1,19 @@
+import { useState } from 'react';
+import { ScrollView, Text, Pressable, View } from 'react-native';
+import { router } from 'expo-router';
+import { useAuth } from '@/src/auth-context';
+import { api } from '@/src/api';
+import { useResource } from '@/src/use-resource';
+import { Screen, Header, Card, Field, Button, Badge, Section, Notice, Empty, Icon, s } from '@/src/components/ui';
+const faqs = [
+  ['How do I find a bus?', 'Select a departure city, destination and journey date on Home. Search results contain only trips published by GoBus operations.'],
+  ['How does seat selection work?', 'The seat map shows the actual bus floor plan configured by the operator. Continue holds your selected seats for five minutes. A temporary hold is not a confirmed booking.'],
+  ['Why can’t I make a payment yet?', 'Payment checkout is waiting for Razorpay configuration. No money is collected and no booking is confirmed until verified payment processing is available.'],
+  ['Where will my tickets appear?', 'Confirmed bookings will be shown in My bookings. Ticket generation, cancellation and refund processing are part of the upcoming payment release.'],
+];
+export default function Support() {
+  const { user } = useAuth(); const { data, refresh, error } = useResource<any[]>(user ? '/support' : null, true);
+  const [expanded, setExpanded] = useState(-1); const [subject, setSubject] = useState(''); const [message, setMessage] = useState(''); const [feedback, setFeedback] = useState(''); const [success, setSuccess] = useState(''); const [busy, setBusy] = useState(false);
+  const send = async () => { setBusy(true); setFeedback(''); setSuccess(''); try { await api('/support', 'POST', { subject, message }); setSubject(''); setMessage(''); setSuccess('Your request is with GoBus support. Replies will appear below.'); await refresh(); } catch (e: any) { setFeedback(e.message); } finally { setBusy(false); } };
+  return <Screen><Header title="A little help along the way" subtitle="We’re here for your journey." back /><ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={s.content}><Section title="Common questions" />{faqs.map(([question, answer], i) => <Pressable key={question} testID={`faq-${i}`} onPress={() => setExpanded(expanded === i ? -1 : i)} style={s.card}><View style={s.between}><Text style={[s.bodyStrong, s.flex]}>{question}</Text><Icon name={expanded === i ? 'remove' : 'add'} size={19} /></View>{expanded === i && <Text style={s.body}>{answer}</Text>}</Pressable>)}<Section title="Let’s talk" />{user ? <><Card><Notice message={feedback || error} /><Notice message={success} success /><Field label="What can we help with?" testID="support-subject-input" value={subject} onChangeText={setSubject} placeholder="A short subject" /><Field label="Tell us a little more" testID="support-message-input" value={message} onChangeText={setMessage} multiline placeholder="Describe your question or issue" /><Button title="Send support request" testID="submit-support-button" onPress={send} loading={busy} /></Card><Section title="Your requests" />{data?.length ? data.map(ticket => <Card key={ticket.id} testID={`my-support-ticket-${ticket.id}`}><Badge title={ticket.status} /><Text style={s.h2}>{ticket.subject}</Text><Text style={s.body}>{ticket.message}</Text>{ticket.reply ? <><View style={s.divider} /><Text style={s.overline}>GOBUS SUPPORT</Text><Text style={s.bodyStrong}>{ticket.reply}</Text></> : <Text style={s.caption}>Awaiting a reply from the support team.</Text>}</Card>) : <Text style={s.body}>You haven’t sent any support requests yet.</Text>}</> : <Empty icon="chatbubbles-outline" title="Let us lend a hand" description="Sign in to send a request and follow the conversation." action={<Button title="Sign in for support" testID="support-sign-in-button" onPress={() => router.push('/sign-in')} />} />}</ScrollView></Screen>;
+}

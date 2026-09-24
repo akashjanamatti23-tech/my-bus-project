@@ -1,0 +1,17 @@
+import React, { useState } from 'react';
+import { ScrollView, Text, View, StyleSheet, RefreshControl } from 'react-native';
+import { router } from 'expo-router';
+import { useAuth } from '@/src/auth-context';
+import { useResource } from '@/src/use-resource';
+import { colors, fonts } from '@/src/theme';
+import { Screen, Header, Card, Button, Badge, Icon, IconButton, Empty, Loading, Notice, s } from '@/src/components/ui';
+import { tripTime } from '@/src/components/trip-card';
+
+export default function DriverHome() {
+  const { user, logout } = useAuth(); const { data, error, loading, refresh } = useResource<any[]>('/driver/trips', true);
+  const [message, setMessage] = useState('');
+  const signOut = async () => { try { await logout(); router.replace('/driver-login'); } catch (e: any) { setMessage(e.message); } };
+  const active = (data || []).filter(trip => trip.status !== 'COMPLETED');
+  return <Screen><Header title="GoBus · Driver" subtitle={user?.driver_code} right={<IconButton name="log-out-outline" testID="driver-logout-button" onPress={signOut} />} /><ScrollView contentContainerStyle={s.content} refreshControl={<RefreshControl refreshing={false} onRefresh={refresh} />}><View style={styles.welcome}><Text style={styles.overline}>YOUR OPERATIONS SCREEN</Text><Text style={styles.name}>Hello, {user?.name.split(' ')[0]}.</Text><Text style={styles.copy}>One road. One trip at a time.</Text></View><Notice message={error || message} />{loading ? <Loading /> : active.length ? active.map(trip => <Card key={trip.id} testID={`driver-trip-${trip.id}`}><View style={s.between}><Badge title={trip.status} /><Text style={s.caption}>{trip.date}</Text></View><Text style={s.h1}>{trip.route.source}{'\n'}to {trip.route.destination}</Text><View style={s.row}><Icon name="bus-outline" /><Text style={s.bodyStrong}>{trip.bus.number} · {trip.bus.name}</Text></View><View style={s.between}><View><Text style={s.caption}>DEPARTURE · IST</Text><Text style={s.h2}>{tripTime(trip.departure_at)}</Text></View><View><Text style={s.caption}>ARRIVAL · IST</Text><Text style={s.h2}>{tripTime(trip.arrival_at)}</Text></View></View><Button title="Open assigned trip" testID={`open-driver-trip-${trip.id}`} icon="arrow-forward" onPress={() => router.push({ pathname: '/driver/trip/[id]', params: { id: trip.id } })} /></Card>) : <Empty icon="bus-outline" title="Ready for your next assignment" description="Your administrator will assign a bus and journey. Only your assigned trips appear here." />}<Button title="Contact operations support" testID="driver-support-button" secondary icon="chatbubbles-outline" onPress={() => router.push('/support')} /><Text style={[s.caption, s.center]}>Keep your attention on the road.{ '\n' }Only operate this screen when safely stopped.</Text></ScrollView></Screen>;
+}
+const styles = StyleSheet.create({ welcome: { padding: 24, backgroundColor: colors.brand, borderRadius: 20, gap: 14 }, overline: { fontFamily: fonts.body, fontSize: 10, fontWeight: '700', letterSpacing: 1.3, color: colors.brandTertiary }, name: { fontFamily: fonts.heading, fontSize: 30, fontWeight: '700', color: colors.onBrand }, copy: { fontFamily: fonts.body, fontSize: 15, color: colors.brandTertiary } });

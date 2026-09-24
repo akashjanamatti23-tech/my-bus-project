@@ -1,0 +1,10 @@
+import { ScrollView, View, Text, Share, RefreshControl } from 'react-native';
+import { useState } from 'react';
+import { useResource } from '@/src/use-resource';
+import { Screen, Header, Card, Badge, Empty, Button, Loading, Notice, Icon, money, s } from '@/src/components/ui';
+export default function Offers() {
+  const { data, error, loading, refresh } = useResource<any[]>('/offers', true);
+  const [message, setMessage] = useState('');
+  const share = async (offer: any) => { try { await Share.share({ message: `GoBus · ${offer.title}\nUse ${offer.code}. ${offer.description}\nValid until ${offer.valid_until}.` }); } catch (e: any) { setMessage(e.message); } };
+  return <Screen bottom={false}><Header title="A little extra for the road" subtitle="Good journeys. Even better value." /><ScrollView contentContainerStyle={s.content} refreshControl={<RefreshControl refreshing={false} onRefresh={refresh} />}><Notice message={error || message} />{loading ? <Loading /> : data?.length ? data.map(offer => <Card key={offer.id} testID={`offer-${offer.id}`}><View style={s.between}><Icon name="pricetag-outline" size={26} /><Badge title={`${offer.discount_percent}% OFF`} /></View><Text style={s.h2}>{offer.title}</Text><Text style={s.body}>{offer.description}</Text><Text style={s.h1}>{offer.code}</Text><Text style={s.caption}>Minimum {money(offer.minimum_amount)} · Save up to {money(offer.maximum_discount)}{ '\n' }Valid until {offer.valid_until}</Text><Text style={s.caption}>Redemption is available when payment checkout is enabled.</Text><Button title="Share offer" testID={`share-offer-${offer.id}`} secondary onPress={() => share(offer)} /></Card>) : <Empty icon="gift-outline" title="Good things are on their way" description="Fresh travel offers will appear here as soon as GoBus operations publishes them. Check back before your next journey." />}{error && <Button title="Try again" testID="retry-offers-button" onPress={refresh} />}</ScrollView></Screen>;
+}

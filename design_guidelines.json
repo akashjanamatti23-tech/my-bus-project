@@ -1,0 +1,194 @@
+{
+  "app_name": "GoBus",
+  "personality": "1 iOS-Native Clean",
+  "personality_one_liner": "A highly readable, trustworthy, and modern transportation platform that balances passenger elegance with admin density and driver operational clarity.",
+  "color": {
+    "surface": "#FFFFFF",
+    "onSurface": "#09090B",
+    "surfaceSecondary": "#F4F4F5",
+    "onSurfaceSecondary": "#18181B",
+    "surfaceTertiary": "#E4E4E7",
+    "onSurfaceTertiary": "#27272A",
+    "surfaceInverse": "#18181B",
+    "onSurfaceInverse": "#FFFFFF",
+    "brand": "#1B4D3E",
+    "onBrand": "#FFFFFF",
+    "brandPrimary": "#1B4D3E",
+    "onBrandPrimary": "#FFFFFF",
+    "brandSecondary": "#2D6A53",
+    "onBrandSecondary": "#FFFFFF",
+    "brandTertiary": "#D1E5DE",
+    "onBrandTertiary": "#1B4D3E",
+    "success": "#059669",
+    "onSuccess": "#FFFFFF",
+    "warning": "#D97706",
+    "onWarning": "#FFFFFF",
+    "error": "#DC2626",
+    "onError": "#FFFFFF",
+    "info": "#52525B",
+    "onInfo": "#FFFFFF",
+    "border": "#E4E4E7",
+    "borderStrong": "#A1A1AA",
+    "divider": "#F4F4F5",
+    "muted": "#71717A"
+  },
+  "typography": {
+    "displayFontFamily": "Plus Jakarta Sans",
+    "textFontFamily": "Geist",
+    "scale": {
+      "sm": 12,
+      "base": 14,
+      "lg": 16,
+      "xl": 20,
+      "2xl": 24
+    }
+  },
+  "spacing": {
+    "rule": "Handle spacing correctly dont have extra spaces where its not required, handle padding and margin corectly and subtle for buttons and components",
+    "xs": 4,
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 24,
+    "2xl": 32,
+    "3xl": 48
+  },
+  "radius_tokens": {
+    "sm": 6,
+    "md": 12,
+    "lg": 20,
+    "pill": 999
+  },
+  "shadow_tier": 1,
+  "navigation": "bottom_tabs",
+  "icon_set": "Phosphor",
+  "glassmorphism": {
+    "enabled": true,
+    "do's": [
+      "Use for sticky headers over scrolling content",
+      "Use for bottom tab bar",
+      "Use for floating action buttons or primary sticky CTAs at the bottom"
+    ],
+    "dont's": [
+      "Never apply to form fields",
+      "Never apply to body text regions",
+      "Do not use on driver operation screen to ensure maximum performance and clarity"
+    ]
+  },
+  "platform_libraries": {
+    "glass": {
+      "ios": "expo-glass-effect",
+      "android": "expo-blur",
+      "low_end_android_fallback": "solid surfaceSecondary"
+    },
+    "image": "expo-image",
+    "blur": "expo-blur",
+    "bottom_sheet": "@gorhom/bottom-sheet",
+    "animation": "react-native-reanimated",
+    "gesture": "react-native-gesture-handler"
+  },
+  "screens": [
+    {
+      "name": "Passenger Home / Search",
+      "purpose": "Allow passengers to quickly enter source, destination, date, and passenger count to find available buses.",
+      "states": {
+        "loading": "Skeleton loader for the search form.",
+        "empty": "N/A - This is a data-entry screen.",
+        "error": "Toast or inline alert indicating network issue."
+      },
+      "layout": "Mobile-first. Use a clean white surface with a hero image at the top featuring a 3-stop vertical gradient scrim. Place the search card (surfaceSecondary, shadow 1) overlapping the hero image's bottom edge. Inputs should be stacked vertically with clear typography. Primary search CTA spans full width at the bottom of the card."
+    },
+    {
+      "name": "Bus Search Results",
+      "purpose": "Display list of available buses based on search criteria with filtering and sorting options.",
+      "states": {
+        "loading": "Centered spinner or skeleton cards.",
+        "empty": "Illustration of an empty bus stop with text 'No buses found for this route.'",
+        "error": "Error message with 'Retry' button."
+      },
+      "layout": "Sticky header with search summary. Filter pills in a horizontally scrolling row below the header. Bus cards are single-column, full width with md padding, displaying operator, timings, duration, seat types, and fare clearly. Use muted text for secondary details."
+    },
+    {
+      "name": "Seat Selection (Dynamic Layout)",
+      "purpose": "Render the exact physical seat/berth layout configured by the Admin for passenger selection.",
+      "states": {
+        "loading": "Spinner overlay.",
+        "empty": "N/A",
+        "error": "Error fetching layout data."
+      },
+      "layout": "Screen split: Top 70% is a 2D map of the bus using grid/flex to match exact rows/cols (seater 2+2, sleeper 1+2, etc.). Legend indicates Available, Selected, Sold, Blocked. Bottom 30% is a sticky summary sheet with selected seat numbers, total fare, and a primary 'Proceed' CTA."
+    },
+    {
+      "name": "Admin Dashboard",
+      "purpose": "Provide a high-level overview of total buses, bookings, revenue, and active journeys.",
+      "states": {
+        "loading": "Skeleton dashboard cards.",
+        "empty": "No data available yet.",
+        "error": "Error fetching stats."
+      },
+      "layout": "Dashboard-oriented, responsive for tablet. Sidebar navigation. Main content area uses a multi-column grid for key metrics (revenue, active buses) and tables for recent bookings. Use clean lines and borders instead of heavy shadows to handle high information density."
+    },
+    {
+      "name": "Admin Visual Seat Layout Builder",
+      "purpose": "Allow admin to visually configure the exact physical seat layout of a bus.",
+      "states": {
+        "loading": "Spinner loading existing layout.",
+        "empty": "Blank grid prompt to start building.",
+        "error": "Error saving layout."
+      },
+      "layout": "Two-panel layout on tablet. Left panel: Tools (Add Seat, Add Berth, Mark Driver, Add Aisle, Delete). Right panel: Interactive grid representing the bus floor plan. Admin taps grid cells to place seats. Clear 'Save Layout' sticky CTA at top right."
+    },
+    {
+      "name": "Driver Home & Today's Trip",
+      "purpose": "Show the driver their currently assigned trip, passenger count, and journey status.",
+      "states": {
+        "loading": "Spinner.",
+        "empty": "Text 'No trips assigned for today.'",
+        "error": "Error loading trip."
+      },
+      "layout": "Extremely readable, current-trip-first design. Large text for Route and Departure Time. Big, high-contrast action button 'Start Boarding'. Minimal navigation. Status indicator pill at top."
+    },
+    {
+      "name": "Driver QR Scanner",
+      "purpose": "Enable fast scanning of passenger tickets at source (boarding) and destination (drop-off).",
+      "states": {
+        "loading": "Camera initializing.",
+        "empty": "Waiting for QR.",
+        "error": "Invalid QR scan alert."
+      },
+      "layout": "Full-screen camera view with a central target box. Bottom sheet shows the last scanned passenger result (Success/Error, Seat Number, Boarding Point). Large, easy-to-tap manual entry fallback button."
+    }
+  ],
+  "images": {
+    "passenger_hero": {
+      "url": "https://images.unsplash.com/photo-1605068263928-dc295689add1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA0MTJ8MHwxfHNlYXJjaHwzfHxsdXh1cnklMjBidXMlMjB0cmF2ZWwlMjBwYXNzZW5nZXIlMjBoaWdod2F5fGVufDB8fHx8MTc5MDI3MDAyMnww&ixlib=rb-4.1.0&q=85",
+      "alt": "white and black luxury passenger bus on road"
+    },
+    "driver_hero_bg": {
+      "url": "https://images.unsplash.com/photo-1730027973512-ce9b4419352d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTJ8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMG1pbmltYWwlMjBnZW9tZXRyaWMlMjBiYWNrZ3JvdW5kJTIwZ3JlZW4lMjBzYW5kfGVufDB8fHx8MTc5MDI3MDAzNnww&ixlib=rb-4.1.0&q=85",
+      "alt": "Abstract minimal green blur background"
+    },
+    "empty_search": {
+      "url": "https://images.unsplash.com/photo-1621422921200-d2130dd7a368?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MTN8MHwxfHNlYXJjaHwxfHxlbXB0eSUyMGJ1cyUyMHN0b3AlMjBpbGx1c3RyYXRpb258ZW58MHx8fHwxNzkwMjcwMDM2fDA&ixlib=rb-4.1.0&q=85",
+      "alt": "Empty bus stop illustration"
+    }
+  },
+  "instructions_to_main_agent": [
+    "Follow '1 iOS-Native Clean' principles. Keep the interface structured, trustworthy, and content-led.",
+    "Implement three separate interfaces/roles (Passenger, Admin, Driver) sharing the same backend architecture.",
+    "CRITICAL: Do NOT use blue colors (navy, indigo, royal blue, etc.). Use the provided custom Deep Forest Green (#1B4D3E) brand color. Substitute default blues with near-black or dark-gray where necessary.",
+    "Admin visual seat layout builder is a core feature; do not hard-code layouts. Store coordinates/types in the DB and render dynamically in Passenger and Driver views.",
+    "Two-stage QR Journey System: Build distinct endpoints and logic for Source QR (boarding) and Destination QR (drop-off). Validate transitions strictly in the backend.",
+    "Driver interface must be highly readable with oversized touch targets (44x44pt min, bigger for main actions), avoiding glassmorphism to prioritize utility and performance.",
+    "Use Phosphor icons consistently across all three interfaces.",
+    "Ensure 'Sticky primary CTA' over scrolling content pattern is applied for Passenger booking flows."
+  ],
+  "haptics": {
+    "primary_button_press": "impactLight",
+    "tab_change": "selection",
+    "seat_select": "impactMedium",
+    "qr_scan_success": "notificationSuccess",
+    "qr_scan_error": "notificationError",
+    "form_submit": "impactMedium"
+  }
+}

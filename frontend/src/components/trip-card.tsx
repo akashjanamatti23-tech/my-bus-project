@@ -1,0 +1,9 @@
+import { Pressable, Text, View } from 'react-native';
+import { router } from 'expo-router';
+import { colors } from '@/src/theme';
+import { Badge, Icon, money, s } from './ui';
+
+export const tripTime = (value: string) => new Date(value).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Kolkata' });
+export function TripCard({ trip, count = '1' }: { trip: any; count?: string }) {
+  return <Pressable testID={`trip-card-${trip.id}`} onPress={() => router.push({ pathname: '/trip/[id]', params: { id: trip.id, count } })} style={({ pressed }) => [s.card, pressed && s.pressed]}><View style={s.between}><View style={s.flex}><Text style={s.h2}>{trip.bus.operator}</Text><Text style={s.caption}>{trip.bus.ac ? 'AC' : 'Non-AC'} · {trip.bus.type} · {trip.bus.name}</Text></View><View style={{ backgroundColor: colors.brandTertiary, borderRadius: 12, padding: 10 }}><Icon name="bus-outline" /></View></View><View style={s.between}><View><Text style={s.h2}>{tripTime(trip.departure_at)}</Text><Text style={s.caption}>{trip.route.source}</Text></View><View style={{ flex: 1, alignItems: 'center', gap: 3 }}><Text style={s.caption}>{Math.floor(trip.route.duration_minutes / 60)}h {trip.route.duration_minutes % 60}m</Text><View style={{ height: 1, width: '80%', backgroundColor: colors.border }} /><Text style={s.caption}>Direct journey</Text></View><View style={{ alignItems: 'flex-end' }}><Text style={s.h2}>{tripTime(trip.arrival_at)}</Text><Text style={s.caption}>{trip.route.destination}</Text></View></View><View style={s.divider} /><View style={s.between}><Badge title={`${trip.available_seats} seats available`} /><View style={{ alignItems: 'flex-end' }}><Text style={s.caption}>from</Text><Text style={[s.h2, { color: colors.brand }]}>{money(trip.from_price)}</Text></View></View></Pressable>;
+}

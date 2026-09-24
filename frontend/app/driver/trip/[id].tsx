@@ -1,0 +1,17 @@
+import React, { useState } from 'react';
+import { ScrollView, Text, View } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+import { api } from '@/src/api';
+import { useResource } from '@/src/use-resource';
+import { SeatMap } from '@/src/components/seat-map';
+import { Screen, Header, Button, Card, Badge, Section, Notice, Loading, Icon, s } from '@/src/components/ui';
+const nextStatus: Record<string, string> = { NOT_STARTED: 'READY', READY: 'BOARDING', BOARDING: 'JOURNEY_STARTED', JOURNEY_STARTED: 'IN_TRANSIT', IN_TRANSIT: 'ARRIVED', ARRIVED: 'COMPLETED' };
+const buttonTitles: Record<string, string> = { READY: 'Mark ready', BOARDING: 'Open boarding', JOURNEY_STARTED: 'Start journey', IN_TRANSIT: 'Mark in transit', ARRIVED: 'Mark arrived', COMPLETED: 'Complete trip' };
+export default function DriverTrip() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const { data: trip, error, loading, refresh } = useResource(`/driver/trips/${id}`, true);
+  const passengers = useResource<any[]>(`/driver/trips/${id}/passengers`, true);
+  const [message, setMessage] = useState(''); const [busy, setBusy] = useState(false);
+  const advance = async () => { setMessage(''); setBusy(true); try { await api(`/driver/trips/${id}/status`, 'POST', { status: nextStatus[trip.status] }); await refresh(); } catch (e: any) { setMessage(e.message); } finally { setBusy(false); } };
+  return <Screen><Header title="Your assigned trip" subtitle={trip?.bus.number} back /><ScrollView contentContainerStyle={s.content}><Notice message={error || message || passengers.error} />{loading ? <Loading /> : trip && <><Card><Badge title={trip.status} /><Text style={s.h1}>{trip.route.source}{'\n'}to {trip.route.destination}</Text><Text style={s.body}>{trip.date} · {trip.departure} IST</Text><Text testID="driver-occupied-count" style={s.h2}>{trip.sold_seat_ids.length} occupied seats</Text></Card><Section title="Boarding & route stops" /><Card>{[...trip.route.boarding_points, ...trip.route.stops, ...trip.route.dropping_points].map((stop: string, i: number) => <View style={s.row} key={`${stop}-${i}`}><Icon name="location-outline" /><Text style={[s.bodyStrong, s.flex]}>{stop}</Text></View>)}</Card><Section title="Passenger manifest" /><Card>{passengers.data?.length ? passengers.data.map(p => <View key={p.id}><Text style={s.bodyStrong}>{p.pnr}</Text>{p.passengers?.map((person: any, i: number) => <Text key={i} style={s.body}>{person.name} · {person.seat_id}</Text>)}<Badge title={p.journey_status || 'BOOKED'} /></View>) : <Text style={s.body}>No confirmed passengers on this trip yet.</Text>}</Card><Section title="Physical bus layout" /><SeatMap layout={trip.layout} states={Object.fromEntries(trip.sold_seat_ids.map((seat: string) => [seat, 'SOLD']))} /><Notice success message="Only your assigned trip is available here. Fares, layouts and assignments are controlled by Admin." /></>}{error && <Button title="Refresh trip" testID="retry-driver-trip-button" onPress={refresh} />}</ScrollView>{trip && nextStatus[trip.status] && <View style={s.footer}><Button title={buttonTitles[nextStatus[trip.status]]} testID="advance-driver-trip-button" onPress={advance} loading={busy} /><Text style={[s.caption, s.center]}>Trip controls open on the scheduled journey date.</Text></View>}</Screen>;
+}
