@@ -39,6 +39,11 @@ Expo SDK57 React Native + Expo Router; FastAPI API under /api; MongoDB shared pe
 - Driver phone test: assigned journey, stops/manifest, future-date operational guard. Tablet1024 sidebar verified; measured document width equals viewport390/1024 (no page overflow). Native device hardware/permissions not tested; camera/location integrations not yet implemented.
 - Removed only identified QA records/accounts; preserved bootstrap Admin and genuine user-created passenger account. No sample operational records remain. Prior iteration_2 rendering report referenced historical logs, resolved independently by troubleshoot agent and fresh browser validation. Final status: `/app/test_reports/foundation_final.json`.
 
+## Operational update — 2026-09-25
+- User reported schedules missing from passenger search. Diagnosis found both real airavata xpress / KA01M2222 trips unpublished, and recent passenger searches requested the reverse direction.
+- At the user's explicit instruction, published existing trips b44a6dbc-1209-41a5-8751-e99804bbe51f (2026-09-25,07:30 IST) and fd33d2b8-bf02-4eec-9094-9bd4c279797f (2026-09-26,07:30 IST), both blgm → bengaluru, through authenticated Admin publication API. No dates, assignments, routes, fares, or layouts changed. Audit records generated normally.
+- Testing agent read-only verification: both trips returned by passenger search, published=true, nine available seats each; reverse-direction search correctly excluded them. Four targeted checks passed. Evidence: /app/test_reports/iteration_3.json. Read-only test file uses these specific dates/records as a point-in-time operational check, not permanent seeded fixtures.
+
 ## Prioritized backlog / full acceptance matrix
 ### P0 — complete transaction/journey core
 - Phase 1 remaining: SMS/email verification provider, six-digit OTP/resend/change number, forgot/reset password, refresh session rotation, staff fine-grained permissions.
