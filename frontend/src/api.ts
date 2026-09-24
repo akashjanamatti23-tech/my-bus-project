@@ -2,7 +2,11 @@ import Constants from 'expo-constants';
 import { storage } from '@/src/utils/storage';
 
 export const TOKEN_KEY = 'gobus.access-token';
-export const API_URL = `${Constants.expoConfig?.extra?.backendUrl ?? ''}/api`;
+const backendUrl = Constants.expoConfig?.extra?.backendUrl as string | undefined;
+if (!backendUrl) {
+  throw new Error('GoBus backend URL is not configured. Set EXPO_PUBLIC_BACKEND_URL before starting the frontend.');
+}
+export const API_URL = `${backendUrl.replace(/\/$/, '')}/api`;
 let expired: (() => void) | undefined;
 export function onSessionExpired(callback: () => void) { expired = callback; }
 export async function api<T = any>(path: string, method = 'GET', body?: unknown): Promise<T> {
