@@ -17,9 +17,9 @@ def storage_key():
     return result.json()['storage_key']
 
 
-def upload(path, data):
+def upload(path, data, content_type='image/jpeg'):
     result = requests.put(f'{STORAGE_URL}/objects/{path}', headers={'X-Storage-Key': storage_key(),
-        'Content-Type': 'image/jpeg'}, data=data, timeout=120)
+        'Content-Type': content_type}, data=data, timeout=120)
     result.raise_for_status()
     return result.json()
 
